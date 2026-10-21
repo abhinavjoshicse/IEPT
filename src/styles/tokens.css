@@ -1,0 +1,133 @@
+/* ───────── Font: one family everywhere — Inter (self-hosted variable, Latin subset) ───────── */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(/fonts/inter-latin-wght-normal.woff2) format('woff2-variations');
+}
+
+/* ───────── Colour tokens (Section 4.2) ─────────
+   Deviations (see CHANGELOG.md, WCAG AA is a MUST): light --acc #2F8F4E → #267A43,
+   light --mute #5D6E61 → #55655A, plus --acc-text / --seal-text / --err for small text. */
+/* ───────── Colour tokens — "Concrete day" (light) / "Asphalt night" (dark) ─────────
+   Identity blue stays on the logo. Lane-marking yellow is the accent (buttons, markers).
+   Green is reserved for the eco touch. All text pairs pass WCAG AA (npm run contrast). */
+:root,
+:root[data-theme='light'] {
+  --bg: #eceae4;
+  --bg-elev: #f8f7f3;
+  --bg-grad: radial-gradient(ellipse at 70% 40%, #fbfaf6 0%, #eceae4 65%);
+  --ink: #141512;
+  --mute: #55574f;
+  --acc: #f5b301;
+  --acc-ink: #141512;
+  --acc-text: #6e4c00;
+  --acc-soft: rgba(245, 179, 1, 0.16);
+  --eco: #256b3b;
+  --eco-soft: rgba(47, 143, 78, 0.1);
+  --brand: #005a8c;
+  --seal: #e8940f;
+  --seal-text: #8a4f00;
+  --err: #b83232;
+  --line: rgba(20, 21, 18, 0.12);
+  --line-strong: rgba(20, 21, 18, 0.28);
+  --card: rgba(248, 247, 243, 0.92);
+  --shadow: 0 1px 0 rgba(20, 21, 18, 0.04), 0 18px 40px -18px rgba(20, 21, 18, 0.25);
+  --focus: 0 0 0 3px rgba(0, 90, 140, 0.45);
+  --footer-bg: #e3e0d8;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0c0d0b;
+  --bg-elev: #161714;
+  --bg-grad: radial-gradient(ellipse at 70% 38%, #2b2415 0%, #14130f 38%, #0c0d0b 72%);
+  --ink: #f3f1ea;
+  --mute: #a2a39b;
+  --acc: #f5b301;
+  --acc-ink: #111210;
+  --acc-text: #f5b301;
+  --acc-soft: rgba(245, 179, 1, 0.12);
+  --eco: #8fd694;
+  --eco-soft: rgba(143, 214, 148, 0.08);
+  --brand: #6bb6e8;
+  --seal: #ffb13b;
+  --seal-text: #ffb13b;
+  --err: #ff7b7b;
+  --line: rgba(243, 241, 234, 0.12);
+  --line-strong: rgba(243, 241, 234, 0.3);
+  --card: rgba(22, 23, 20, 0.92);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 24px 50px -20px rgba(0, 0, 0, 0.7);
+  --focus: 0 0 0 3px rgba(107, 182, 232, 0.55);
+  --footer-bg: #080907;
+}
+
+:root {
+  /* Type */
+  --f-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* single typeface site-wide (client request): display + label roles map to Inter */
+  --f-serif: var(--f-sans);
+  --f-mono: var(--f-sans);
+  --fs-h1: clamp(52px, 6.4vw, 104px);
+  --fs-h2: clamp(34px, 3.6vw, 56px);
+  --fs-h3: 17px;
+  --fs-body: 16px;
+  --fs-small: 13px;
+  --fs-eyebrow: 12px;
+
+  /* Spacing (base 8) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 96px;
+  --s10: 128px;
+  --pad-x: 96px;
+  --max-w: 1200px;
+
+  /* Radii */
+  --r-pill: 8px;
+  --r-card: 12px;
+  --r-form: 14px;
+  --r-input: 8px;
+
+  /* Motion (4.5) */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-med: 320ms;
+  --dur-slow: 700ms;
+
+  --nav-h: 64px;
+}
+
+@media (max-width: 1279px) {
+  :root {
+    --pad-x: 48px;
+  }
+}
+@media (max-width: 1279px) and (min-width: 900px) {
+  :root {
+    --fs-h1: 60px;
+  }
+}
+@media (max-width: 767px) {
+  :root {
+    --pad-x: 20px;
+    --fs-h1: 40px;
+    --fs-h2: 30px;
+    --fs-h3: 16px;
+    --fs-body: 15px;
+    --fs-eyebrow: 11px;
+  }
+}
+@media (max-width: 899px) and (min-width: 768px) {
+  :root {
+    --fs-h1: 50px;
+    --fs-h2: 36px;
+  }
+}

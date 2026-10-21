@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body><script type="module">
+// Concept D — "Minimal plates": clean, rounded, matte plates in a calm palette, isometric view,
+// generous spacing. Diagram-like and premium rather than realistic.
+import { THREE, LAYERS, setup, done, dark, softFloor } from './common.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+const { renderer, scene } = setup();
+const aspect = innerWidth / innerHeight, fr = 3.1;
+const camera = new THREE.OrthographicCamera(-fr * aspect, fr * aspect, fr, -fr, 0.1, 100);
+const pal = dark
+  ? ['#6b5440', '#9a917f', '#7d7a73', '#3a3936', '#1f2021']
+  : ['#8c6e52', '#c3b9a4', '#a5a197', '#4a4845', '#262728'];
+let y = 0;
+LAYERS.forEach((L, i) => {
+  const h = L.h * 1.1;
+  const g = new RoundedBoxGeometry(6.2, h, 3.4, 4, Math.min(0.09, h / 2.2));
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: pal[i], roughness: 0.62, metalness: 0 }));
+  m.position.set(0, y + h / 2, 0); m.castShadow = m.receiveShadow = true; scene.add(m);
+  if (i === 4) {
+    // lane dashes as tiny raised strips
+    const dash = new THREE.MeshStandardMaterial({ color: 0xf5b301, roughness: 0.5 });
+    for (let x = -2.6; x < 2.7; x += 0.9) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.07), dash); d.position.set(x, y + h + 0.005, 0); scene.add(d); }
+    const edge = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.5 });
+    [-1.45, 1.45].forEach((z) => { const e = new THREE.Mesh(new THREE.BoxGeometry(5.9, 0.02, 0.05), edge); e.position.set(0, y + h + 0.005, z); scene.add(e); });
+  }
+  y += h + 0.42;
+});
+softFloor(scene, 0, dark ? '#050b07' : '#dce3d4', 0.45, 3, 10);
+camera.position.set(-10, 9.5, 12); camera.lookAt(0, 1.3, 0);
+camera.setViewOffset(innerWidth * 1.3, innerHeight, 0, 0, innerWidth, innerHeight);
+camera.left = -fr * aspect * 1.3; camera.right = fr * aspect * 1.3; camera.updateProjectionMatrix();
+done(renderer, scene, camera);
+</script></body></html>

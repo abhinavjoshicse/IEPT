@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body><script type="module">
+// Concept B — "Road cutaway": a real embankment profile (layers widen with depth, sloped sides)
+// running off into the distance; the front is cut open like a section drawing.
+import { THREE, LAYERS, setup, layerCanvases, tex, softFloor, done, dark } from './common.js';
+const { renderer, scene, camera } = setup();
+const cv = layerCanvases();
+const LEN = 34;
+const S = 1.25; // vertical exaggeration
+let y = 0;
+const top = LAYERS.reduce((a, l) => a + l.h * S, 0);
+const halfTop = 3.6;
+// build bottom → top; each layer's half-width shrinks going up, sides slope 1:1.5
+const shapes = [];
+let yy = 0;
+LAYERS.forEach((L, i) => { const h = L.h * S; shapes.push({ i, y0: yy, y1: yy + h }); yy += h; });
+shapes.forEach(({ i, y0, y1 }) => {
+  const hw = (yv) => halfTop + (top - yv) * 1.5 + (i === 0 ? 1.2 : 0);
+  const s = new THREE.Shape();
+  s.moveTo(-hw(y0), y0); s.lineTo(hw(y0), y0); s.lineTo(hw(y1), y1); s.lineTo(-hw(y1), y1); s.lineTo(-hw(y0), y0);
+  const g = new THREE.ExtrudeGeometry(s, { depth: LEN, bevelEnabled: false });
+  g.translate(0, 0, -LEN);
+  const t = tex(cv[i], { half: 'side', repeat: [1 / 7, 1 / 3.5] });
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: t, roughness: 0.92 }));
+  m.castShadow = m.receiveShadow = true; scene.add(m);
+});
+// lane-marked surface running along the road
+const lane = tex(cv[4], { half: 'top', repeat: [LEN / 7, 1] });
+const pg = new THREE.PlaneGeometry(LEN, halfTop * 2); pg.rotateX(-Math.PI / 2); pg.rotateY(Math.PI / 2); pg.translate(0, top + 0.002, -LEN / 2);
+const surf = new THREE.Mesh(pg, new THREE.MeshStandardMaterial({ map: lane, roughness: 0.75 })); surf.receiveShadow = true; scene.add(surf);
+// grass verges on the embankment slopes
+[-1, 1].forEach((sx) => {
+  const vg = new THREE.PlaneGeometry(LEN, 2.2); vg.rotateX(-Math.PI / 2); vg.rotateY(Math.PI / 2);
+  const v = new THREE.Mesh(vg, new THREE.MeshStandardMaterial({ color: dark ? 0x2f5a35 : 0x7fb56e, roughness: 1 }));
+  v.position.set(sx * (halfTop + 1.3), top - 0.55, -LEN / 2); v.rotation.z = sx * 0.55; v.receiveShadow = true; scene.add(v);
+});
+softFloor(scene, 0, dark ? '#050b07' : '#dce3d4', 0.5, 6, 18);
+camera.position.set(-10.5, 8, 14); camera.lookAt(0.5, 0.6, -5);
+camera.setViewOffset(innerWidth * 1.45, innerHeight, 0, 0, innerWidth, innerHeight); camera.aspect = innerWidth * 1.45 / innerHeight; camera.updateProjectionMatrix();
+done(renderer, scene, camera);
+</script></body></html>

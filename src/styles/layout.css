@@ -1,0 +1,754 @@
+/* ───────────────────────── NAV ───────────────────────── */
+#nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--nav-h);
+  z-index: 50;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out),
+    backdrop-filter var(--dur-med) var(--ease-out);
+}
+#nav.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--line);
+}
+/* Logo is never over the 3D canvas without a nav background (4.1) */
+/* Over the live canvas a backdrop blur would be re-computed every frame — use a denser
+   tint instead (same look, no per-frame cost). */
+html.js:not(.static-story) #nav,
+html.js:not(.static-story) #nav.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.nav-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s5);
+  padding: 0 var(--pad-x);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--brand);
+  text-decoration: none;
+  /* clear space ≥ width of the "I" stroke */
+  padding: 4px;
+  margin: -4px;
+}
+.logo-mark {
+  color: var(--brand);
+  height: 22px;
+  width: auto;
+  flex: none;
+}
+.brand-tagline {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--mute);
+  white-space: nowrap;
+  line-height: 1;
+}
+.nav-links {
+  display: flex;
+  gap: var(--s6);
+  margin-left: auto;
+}
+.nav-links a {
+  position: relative;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mute);
+  text-decoration: none;
+  line-height: 1;
+  padding: 8px 0;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--acc);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+.nav-links a:hover,
+.nav-links a.is-active {
+  color: var(--ink);
+}
+.nav-links a.is-active::after {
+  transform: scaleX(1);
+}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+}
+.menu-btn {
+  display: none;
+}
+
+@media (max-width: 1099px) {
+  .brand-tagline {
+    display: none;
+  }
+}
+@media (max-width: 899px) {
+  .nav-links,
+  .nav-actions > .theme-toggle,
+  .nav-cta {
+    display: none;
+  }
+  .menu-btn {
+    display: inline-flex;
+  }
+}
+@media (max-width: 767px) {
+  .logo-mark {
+    height: 18px;
+  }
+}
+
+/* ───────────────────────── STORY ───────────────────────── */
+#story {
+  position: relative;
+}
+.story-sticky {
+  position: relative;
+}
+.story-bg,
+.story-bg i {
+  position: absolute;
+  inset: 0;
+}
+.story-bg i {
+  transition: opacity var(--dur-slow) var(--ease-inout);
+}
+.story-bg .bg-light {
+  background: radial-gradient(ellipse at 70% 40%, #fbfaf6 0%, #eceae4 65%);
+}
+.story-bg .bg-dark {
+  background: radial-gradient(ellipse at 70% 38%, #2b2415 0%, #14130f 38%, #0c0d0b 72%);
+  opacity: 0;
+}
+:root[data-theme='dark'] .story-bg .bg-light {
+  opacity: 0;
+}
+:root[data-theme='dark'] .story-bg .bg-dark {
+  opacity: 1;
+}
+#webgl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}
+#webgl.is-ready {
+  opacity: 1;
+}
+
+/* Pinned (scroll-driven) mode — only when JS is on and motion allowed */
+html.js:not(.static-story) #story {
+  height: 478vh; /* was 600vh: hero → services scroll halved */
+}
+html.js:not(.static-story) .story-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+html.js:not(.static-story) .story-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+html.js:not(.static-story) .beat {
+  position: absolute;
+  left: var(--pad-x);
+  top: 24%;
+  width: 480px;
+  pointer-events: auto;
+}
+html.js:not(.static-story) #beat-hero {
+  width: 560px;
+  top: 25%;
+}
+html.js:not(.static-story) #beat-services {
+  top: 22%;
+}
+html.js:not(.static-story) #beat-products {
+  top: 20%;
+  width: 640px;
+}
+html.js:not(.static-story) #beat-products .beat-text {
+  width: 480px;
+}
+html.js:not(.static-story) #beat-eco {
+  top: 26%;
+}
+/* before the timeline takes over, only the hero is visible */
+html.js:not(.static-story) .beat:not(#beat-hero) {
+  visibility: hidden;
+  opacity: 0;
+}
+html.js:not(.static-story) .beat-figure {
+  display: none;
+}
+/* the layer list is the label column: always visible, linked to the cut face by leader lines */
+
+@media (max-width: 1279px) {
+  html.js:not(.static-story) .beat {
+    width: 400px;
+  }
+  html.js:not(.static-story) #beat-hero {
+    width: 480px;
+  }
+  html.js:not(.static-story) #beat-products .beat-text {
+    width: 400px;
+  }
+}
+
+/* tablet + phone (and small laptops < 1100 px): beats in top 40%, centred; 3D in bottom 60% */
+@media (max-width: 1099px) {
+  html.js:not(.static-story) .story-sticky {
+    height: 100svh;
+  }
+  html.js:not(.static-story) .beat,
+  html.js:not(.static-story) #beat-hero,
+  html.js:not(.static-story) #beat-services,
+  html.js:not(.static-story) #beat-products,
+  html.js:not(.static-story) #beat-eco {
+    top: calc(var(--nav-h) + 20px);
+    left: var(--pad-x);
+    right: var(--pad-x);
+    width: auto;
+    text-align: center;
+  }
+  html.js:not(.static-story) #beat-products .beat-text {
+    width: auto;
+  }
+  html.js:not(.static-story) .beat .btn-row {
+    justify-content: center;
+  }
+}
+html.js.labels-compact:not(.static-story) .layer-list {
+  margin: var(--s4) auto 0;
+  max-width: 420px;
+  position: static !important;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+@media (max-width: 767px) {
+  html.js:not(.static-story) #beat-services .lede {
+    display: none;
+  }
+}
+
+/* Static story — no JS, reduced motion, or no WebGL */
+html:not(.js) #story,
+html.static-story #story {
+  height: auto;
+}
+html:not(.js) .story-bg,
+html:not(.js) #webgl,
+html:not(.js) .labels,
+html:not(.js) .rail,
+html:not(.js) .progress,
+html:not(.js) .scroll-hint,
+html.static-story .story-bg,
+html.static-story #webgl,
+html.static-story .labels,
+html.static-story .rail,
+html.static-story .progress,
+html.static-story .scroll-hint {
+  display: none !important;
+}
+html:not(.js) .story-overlay,
+html.static-story .story-overlay {
+  max-width: calc(var(--max-w) + 2 * var(--pad-x));
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + var(--s7)) var(--pad-x) var(--s8);
+  display: grid;
+  gap: var(--s9);
+}
+html:not(.js) .beat,
+html.static-story .beat {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-areas: 'text fig' 'cards fig';
+  align-items: center;
+  column-gap: var(--s8);
+  row-gap: var(--s5);
+}
+html:not(.js) .beat .beat-text,
+html.static-story .beat .beat-text {
+  grid-area: text;
+}
+html:not(.js) .beat .cards,
+html.static-story .beat .cards {
+  grid-area: cards;
+}
+html:not(.js) .beat-figure,
+html.static-story .beat-figure {
+  grid-area: fig;
+  margin: 0;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg-grad);
+  aspect-ratio: 16 / 10;
+}
+html:not(.js) .beat-figure img,
+html.static-story .beat-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width: 899px) {
+  html:not(.js) .beat,
+  html.static-story .beat {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'text' 'fig' 'cards';
+  }
+}
+
+/* Story beat internals */
+.beat-text > * + * {
+  margin-top: var(--s4);
+}
+.beat-text h1,
+.beat-text h2 {
+  margin-top: var(--s4);
+}
+.display .line {
+  display: block;
+}
+.lede {
+  color: var(--mute);
+  max-width: 44ch;
+}
+@media (max-width: 1099px) {
+  html.js:not(.static-story) .lede {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  margin-top: var(--s5) !important;
+}
+.eco-line {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  font-family: var(--f-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-size: 34px;
+  line-height: 1.15;
+}
+@media (max-width: 1099px) {
+  html.js:not(.static-story) .eco-line {
+    justify-content: center;
+    font-size: 26px;
+  }
+}
+.leaf {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  fill: var(--acc);
+}
+
+/* ───────────────────────── STATIC SECTIONS ───────────────────────── */
+.section {
+  position: relative;
+  padding: var(--s9) var(--pad-x);
+  background: var(--bg);
+}
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+#about {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+#about > .wrap {
+  width: 100%;
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: 6fr 4fr;
+  gap: var(--s9);
+  align-items: center;
+}
+.about-grid h2 {
+  margin: var(--s4) 0 var(--s5);
+  max-width: 16ch;
+}
+.about-grid p + p {
+  margin-top: var(--s4);
+}
+.about-grid > div:first-child p {
+  color: var(--mute);
+}
+.about-grid > div:first-child .eyebrow {
+  color: var(--acc-text);
+}
+.focus-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--s6) 0 0;
+  display: grid;
+  gap: var(--s3);
+}
+.focus-list li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 15px;
+}
+.focus-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--acc);
+}
+.stats {
+  display: grid;
+  gap: var(--s4);
+}
+
+#eco {
+  background: var(--eco-soft);
+  padding-top: var(--s8);
+  padding-bottom: var(--s8);
+}
+.eco-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: var(--s7);
+  align-items: center;
+}
+.eco-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+}
+.eco-head h2 {
+  font-size: clamp(28px, 3vw, 40px);
+}
+.eco-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s5);
+}
+.eco-points li {
+  display: grid;
+  gap: var(--s2);
+  padding-left: var(--s4);
+  border-left: 1px solid var(--line);
+  font-size: 15px;
+}
+
+#contact {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+#contact > .wrap {
+  width: 100%;
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: var(--s9);
+  align-items: start;
+}
+.contact-info h2 {
+  margin: var(--s4) 0 var(--s5);
+}
+.contact-info > p {
+  color: var(--mute);
+  max-width: 44ch;
+}
+.contact-list {
+  margin: var(--s6) 0 var(--s5);
+  display: grid;
+  gap: var(--s4);
+}
+.contact-list div {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: var(--s4);
+  align-items: baseline;
+}
+.contact-list dt {
+  font-family: var(--f-sans);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.contact-list dd {
+  margin: 0;
+}
+.contact-list a {
+  color: var(--ink);
+  text-decoration-color: var(--line);
+}
+.contact-list a:hover {
+  color: var(--brand);
+}
+.map-ph {
+  height: 180px;
+  border-radius: var(--r-card);
+  border: 1px dashed var(--line);
+  background: repeating-linear-gradient(45deg, transparent 0 10px, var(--acc-soft) 10px 11px), var(--bg-elev);
+  display: grid;
+  place-items: center;
+  color: var(--mute);
+  font-family: var(--f-sans);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ───────────────────────── FOOTER ───────────────────────── */
+#footer {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--line);
+  padding: var(--s8) var(--pad-x) var(--s6);
+  color: var(--ink);
+}
+.footer-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1.2fr 1fr;
+  gap: var(--s7);
+}
+.f-brand .logo-mark {
+  height: 40px;
+}
+.f-tagline {
+  margin-top: var(--s4);
+  font-size: 14px;
+}
+.f-mission {
+  margin-top: var(--s3);
+  font-size: var(--fs-small);
+  color: var(--mute);
+  max-width: 36ch;
+}
+.footer-row .eyebrow {
+  color: var(--mute);
+  margin-bottom: var(--s4);
+}
+.f-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.f-links a,
+.f-contact a,
+.footer-legal a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+.f-links a:hover,
+.f-contact a:hover,
+.footer-legal a:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+.f-contact p {
+  font-size: 14px;
+  color: var(--mute);
+}
+.f-contact p + p {
+  margin-top: var(--s2);
+}
+.social-row {
+  display: flex;
+  gap: var(--s3);
+}
+.social-row a {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.social-row a:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.social-row svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+.footer-legal {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s4);
+  flex-wrap: wrap;
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+  color: var(--mute);
+}
+.footer-legal a {
+  font-size: var(--fs-small);
+  color: var(--mute);
+}
+
+/* ───────────────────────── RESPONSIVE (static sections) ───────────────────────── */
+@media (max-width: 1023px) {
+  .about-grid,
+  .contact-grid,
+  .eco-grid {
+    grid-template-columns: 1fr;
+    gap: var(--s7);
+  }
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .footer-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .contact-grid .form-card {
+    max-width: 520px;
+    width: 100%;
+  }
+}
+@media (max-width: 767px) {
+  .section {
+    padding-top: var(--s8);
+    padding-bottom: var(--s8);
+  }
+  .stats,
+  .eco-points {
+    grid-template-columns: 1fr;
+  }
+  .footer-row {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+  }
+  .contact-list div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+@media (max-width: 767px) {
+  html.js:not(.static-story) #story {
+    height: 402vh; /* was 500vh */
+  }
+}
+
+/* stacked story: keep the products beat compact so it stays in the top band */
+@media (max-width: 1099px) {
+  html.js:not(.static-story) #beat-products .lede,
+  html.js:not(.static-story) .product-card p:not(.code) {
+    display: none;
+  }
+  html.js:not(.static-story) .beat h1,
+  html.js:not(.static-story) .beat h2 {
+    margin-top: var(--s3);
+  }
+}
+@media (max-width: 1099px) and (min-width: 600px) {
+  html.js:not(.static-story) .product-card {
+    width: 190px;
+  }
+}
+@media (min-width: 1100px) {
+  html.js:not(.static-story) #beat-services .lede {
+    max-width: 36ch;
+  }
+}
+
+/* ───── redesign motifs ───── */
+/* lane-marking band where the story hands over to the page */
+#about::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, var(--acc) 0 48px, transparent 48px 84px);
+  opacity: 0.9;
+}
+#eco .leaf,
+#beat-eco .leaf {
+  fill: var(--eco);
+}
+.eco-points .eyebrow {
+  color: var(--eco);
+}
+.eco-points .eyebrow::before {
+  background: var(--eco);
+}
+.about-grid > div:first-child .eyebrow {
+  color: var(--acc-text);
+}
+
+/* legibility scrim: the copy column always sits on a calm tone, whatever the 3D behind it */
+html.js:not(.static-story) .story-sticky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 88%, transparent) 0%, color-mix(in srgb, var(--bg) 62%, transparent) 32%, transparent 52%);
+  z-index: 0;
+}
+html.js:not(.static-story) .story-overlay,
+html.js:not(.static-story) .progress,
+html.js:not(.static-story) .scroll-hint {
+  z-index: 1;
+}
+@media (max-width: 1099px) {
+  html.js:not(.static-story) .story-sticky::after {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 90%, transparent) 0%, color-mix(in srgb, var(--bg) 70%, transparent) 30%, transparent 48%);
+  }
+}
