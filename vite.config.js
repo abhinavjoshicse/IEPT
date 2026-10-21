@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import contentPlugin from './scripts/build-content.js';
 
 export default defineConfig({
+  base: '/IEPT/',
   plugins: [contentPlugin()],
   build: {
     target: 'es2020',

@@ -5,7 +5,7 @@ export const content = {
     seoDescription:
       'Indocore Engineering & Pavement Technologies provides sustainable pavement construction, maintenance, pothole repair, crack sealing and concrete pavement solutions.',
     ogTitle: 'IEPT — Intelligent, resilient pathways',
-    url: 'https://example.com/',
+    url: 'https://abhinavjoshicse.github.io/IEPT/',
   },
   brand: { name: 'Indocore Engineering & Pavement Technologies', short: 'IEPT' },
   nav: {
